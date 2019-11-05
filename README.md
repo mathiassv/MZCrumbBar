@@ -1,4 +1,9 @@
 # MZCrumbBar
-MFC/C++ Crumbbar Controller
+Windows MFC/C++ Crumbbar Controller
 
-![Alt text](Doc/MZCrumbBar1.png?raw=true "Title")
+MFC Controller to shows items in a field that is clickable.
+Can be a path or other items need to be shown in a Crumbbar way
+
+Can easyly be inherited to customize style and usage
+
+![Alt text](Doc/MZCrumbBar1.png?raw=true "Image from DemoApp")
