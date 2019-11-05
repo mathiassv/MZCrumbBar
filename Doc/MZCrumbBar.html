@@ -1,0 +1,195 @@
+﻿<pre>
+Title:       MZCrumbBar
+Author:      Mathias S
+Email:       matsve@result42.com
+Member ID:   54110
+Language:    C++
+Platform:    Windows
+Technology:  MFC
+Level:       Intermediate
+Description: Multipurpose Crumbbar Controller
+Section      Staitc & Panel Controls
+SubSection   General
+License:     CPOL</pre>
+
+
+<h2>Introduction</h2>
+
+<p>I needed a bredcrumb bar like the one in Windows Vista so I could show a path and
+    have the path to be clickable, But I also needed a crumbbar in another project,
+    and it had nothing to do with file paths. So I build this CrumbBar controller that are generic. 
+    It can shown any string with delimiters as a crumb-bar.</p>
+
+<h2>Features</h2>
+<div>
+<ul>
+    <li>Any string with delimiter can be shown as a crumbbar<br />
+    <img alt="CrumbBar showing a none file path " src="MZCrumbBar5.png" />
+    </li>
+    <li>Can go into edit mode if clicked on<br />
+    (configurable on what clicks will trun it to editable). <br />
+    <img alt="Go into edit mode if clicked on" src="MZCrumbBar3.png" /></li>
+    <li>Send notification on what item was clicked. notifications can be sent for both Single and Dubble clicks on all 3 mouse buttons.</li>
+    <li>Support 'go back' item if not all crumb items fits in the conroller<br />
+    <img alt="Go into edit mode if clicked on" src="MZCrumbBar6.png" />
+    </li>
+    <li>Support a left margin and item spacing.</li>
+    <li>Support Gradient background. </li>
+    <li>Can easly be custom drawn to implement your own drawing of the crumb items.<br />
+    <img alt="Custom draw of crumbbar items" src="MZCrumbBar4.png" />
+    </li>
+</ul>
+</div>
+<h2>Create the controller</h2>
+<p>Adding MZCrumbBar to a dialog.</p>
+<p><img alt="Custom Control Properties" src="MZCrumbBar2.png" /></p>
+<ol>
+    <li>Add a custom controller to the layout where you want to have it.</li>
+    <li>Set the ID of the properties to something like IDC_CRUMBBAR. </li>
+    <li>Class name in properties must be <b>"MZCrumbBarCtrl"</b>.</li>
+    <li>Then set the style flags you want. like 0x50810001. if you do not want any border (WS_BORDER) remove 0x00800000 from the value.</li>
+    <li>Then Add a MZCrumbBar variable to you dialog class</li>
+    <li>To connect the custom controller in the dialog layout with the <b>m_CrumbBar</b> variable you need to add some code into DoDataExchange.<br />
+<pre lang="C++">void CCrumbBarDemoDlg::DoDataExchange(CDataExchange* pDX)
+{
+	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_CRUMBBAR, m_CrumbBar);
+}</pre>
+    </li>
+    <li>Then configure the controller how you want it in OnInitDialog().</li>
+</ol>
+<h2>Configuring</h2>
+<p>Option on when the controller should turn into Edit Mode.<br/>
+Set them as StyleEx flags in Create or with MZCrumbBar::Style(...)</p>
+<pre lang="C++">
+#define CRU_EDITOUTSIDE   0x00000010 // Click must be outside of crumb items. 
+#define CRU_EDITONCLK_L   0x00000100 // Enter Edit mode on Left Click
+#define CRU_EDITONDBL_L   0x00000200 // Enter edit mode on Left DblClick 
+#define CRU_EDITONCLK_R   0x00000400 // Enter Edit mode on Right Click 
+#define CRU_EDITONDBL_R   0x00000800 // Enter edit mode on Right DblClick 
+#define CRU_EDITONCLK_M   0x00001000 // Enter Edit mode on Middle Click 
+#define CRU_EDITONDBL_M   0x00002000 // Enter edit mode on Middle DblClick 
+#define CRU_LASTITEMCOLD  0x00010000 // Show no hover action for the last item 
+#define CRU_LASTITEMNOCLK 0x00020000 // Do not generate click action for the last item 
+#define CRU_LASTITEMNODELIMITER 0x00040000  // Do not draw a delimiter for the last item
+</pre>
+<p>Flags for configuring how the delimiter show be shown. Set the option via the DelimiterMode(...) function. </p>
+<pre lang="C++">
+#define DM_STRIP 0 // Strip the delimiter char 
+#define DM_LEFT  1 // Show Delimiter in the Left part 
+#define DM_RIGHT 2 // Show Delimiter in the right part 
+</pre>
+<h2>Set Colors and Margins</h2>
+<pre lang="C++"> m_CrumbBar.ColorDefault( RGB(255, 0, 0));
+ m_CrumbBar.ColorHot( RGB(255, 0, 0));
+ m_CrumbBar.BackgroundColor( RGB(255, 0, 0), RGB(0,0,0), true);
+ m_CrumbBar.Margin(10);
+ m_CrumbBar.ItemSpacing(6);
+</pre>
+<h2>Using the Crumbbar</h2>
+<pre lang="C++">
+// Initilizing the CrumbBar.
+m_CrumbBar.Path(_T("C:\\MyFolder\\SubFiles1\\SubFolder2\\")); 
+m_CrumbBar.Delimiter(_T("\\"));
+m_CrumbBar.DelimiterMode(DM_RIGHT);
+
+// Create a PreItem and set the preitem to "..\\"
+MZCrumbBar::CrumbBarItem PreItem(_T(""), _T("..\\")); 
+m_CrumbBar.PreItem(PreItem); 
+
+// Rebuild/Update the CrumbBar.
+m_CrumbBar.BuildCrumbbar();
+
+// Get The Complete path.
+CString path = m_crumbBar.Path();
+
+// Get the path up to and including a specific CrumbBar item.
+CString path = m_crumbBar.GetPath( pCrumbBarItem );
+</pre>
+<h2>Notifications</h2>
+<p>There are a few notification messages that are used to notify the owner window when things have happend.</p>
+<pre lang="C++">#define NMCB_LBCLICK    1000 // User clicked with Left Mouse Button 
+#define NMCB_RBCLICK    1001 // User clicked with Right Mouse Button 
+#define NMCB_MBCLICK    1002 // User clicked with Middle Mouse Button 
+#define NMCB_LBDBLCLICK 1003 // User double clicked with Left Mouse Button 
+#define NMCB_RBDBLCLICK 1004 // User double clicked with Right Mouse Button 
+#define NMCB_MBDBLCLICK 1005 // User double clicked with Middle Mouse Button 
+#define NMCB_EDITCHANGE 1010 // User changed path by editing it
+</pre>
+<p>To catch the notification message you need can do this in you dialog.</p>
+<pre lang="C++"> // in .h file
+ afx_msg void OnCrumbBarItemClicked(NMHDR *pNotifyStruct, LRESULT* pResult) ;
+
+ // in .cpp file
+ BEGIN_MESSAGE_MAP(CCrumbBarDemoDlg, CDialog)
+	ON_NOTIFY( NMCB_LBCLICK, IDC_CRUMBBAR , OnCrumbBarItemClicked) 
+ END_MESSAGE_MAP()
+
+ void CCrumbBarDemoDlg::OnCrumbBarItemClicked(NMHDR* pNotifyStruct, LRESULT* pResult) 
+ {
+	NM_CRUMBBARITEM* pnmCrumbBarItem = (NM_CRUMBBARITEM*)pNotifyStruct;
+
+	// CrumbBar Item that was clicked
+	pnmCrumbBarItem-&gt;pCrumbBarItem;
+
+	// CrumbBar Path for clicked item
+	pnmCrumbBarItem-&gt;strCrumbPath;
+
+	// Mouse position when click happend.
+	// use for example to show a context menu with sub folder, like Explorer in Windows Vista
+	pnmCrumbBarItem-&gt;pt;
+
+	...
+ }
+</pre>
+<h2>Custom Draw the CrumbBar Items</h2>
+<img alt="Custom draw of crumbbar items" src="MZCrumbBar4.png" /><br />
+<img alt="Custom draw of crumbbar items" src="MZCrumbBar7.png" />
+<p>To change the CrumbBar to a custom look you need to override a couple of functions.</p>
+<pre lang="C++">
+  // Return the width of the crumbbar item.
+  virtual int OnMeasureItem(CDC* pDC, CrumbBarItem* pItem);
+  
+  // Return width if the PreItem (item that is shown at the begning if not all crumbbar items can be drawn)
+  virtual int OnMeasurePreItem(CDC* pDC);
+
+  // Draw CrumbBar Item
+  virtual void DrawCrumbItem(CrumbBarItem* pItem, CDC* pDC, CRect rc);
+  
+  // Draw PreItem
+  virtual void DrawPreItem(CrumbBarItem* pItem, CDC* pDC, CRect rc);
+</pre>
+<p>Take a look at CBlockCrumbBar.h/.cpp in the source for the Demo App to see how it can be done.</p>
+
+
+<h2>History</h2>
+<p>For full history check the header in MZCrumbBar.cpp</p>
+<ul>
+ 	<li>v1.3  2010-11-13  <br />
+             Added flag CRU_DONOTSTRIPDELIMITER that will keep double delimiter.<br />
+             Double delimiter are use to tell MZCrumbarCtrl that it should not break a path<br />
+             when it sees a delimiter.<br />
+             eg "Main-Sub-Sub--Menu" -> last item is normal shown as "Sub-Menu"<br />
+             but with this flag it is shown as "Sub--Menu" since the double delimiter is not stripped,<br />
+             For example "\\Server\Share\Folder" -> first item will now be shown as "\\Server" <br />
+             and not as "\Server"
+ 	<li>v1.2  2010-04-15  <br />
+            <ul><li>Added improvments/fixes provided by Iain Clarke<br/>
+            - 3 more BuildCrumbbar(...) function for special situations.<br/>
+            - Refactored how a path is parsed.<br/>
+            - Added CRU_LASTITEMNODELIMITER. If style is set the Delimiter will not be shown for last crumbbar item.<br/>
+            - Style can now be set using styleEx.<br/>
+            - Change Default hot color to COLOR_HOTLIGHT.<br/>
+            - Added possibility to store custom data in a Crumbar item.<br/>
+            - Added SetItemData/GetItemData of custom data to crumbbar items.<li/>
+            </ul>
+            - Fixed so that if double delimiter now works again. Double delimiter should be part of the crumbpath name, not a splitter.<br />
+            - Change so that items are added to m_vCrumbItems via the virtual function AddCrumbItem(...)<br />
+            - Fixed so that empty path parts are not added to the path.</li>
+    <li>v1.1 - 2010-03-17 - First public version. Fixed minor draw issue.</li>
+    <li>v1.0 - 2009-10-10 - First version</li>
+</ul>
+<h2>Credits</h2>
+<ul>
+    <li>Borrowed Gradient code from <a href="http://www.codeproject.com/KB/static/clabel.aspx">CLabel</a> by Norm.net
+</ul>
