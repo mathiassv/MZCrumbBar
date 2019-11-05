@@ -1,6 +1,6 @@
 /* MZCrumbBar.h
 
-MZCrumbBar Ctrl - Created by Mathias Svensson (c) Copyright 2009-2012 - http://result42.com
+MZCrumbBar Ctrl - Created by Mathias Svensson (c) Copyright 2009-2019 - https://github.com/mathiassv/MZCrumbBar - http://result42.com
 
 See top of MZCrumbBar.cpp for more information and History
 
